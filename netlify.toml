@@ -1,0 +1,6 @@
+# Cors proxy redirect without lambda function
+#[[redirects]]
+#  from = "/cors-proxy/*"
+#  to = ":splat"
+#  status = 200
+#  force = true
