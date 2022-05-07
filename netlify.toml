@@ -1,7 +1,7 @@
 # Cors proxy redirect without lambda function
-[[redirects]]
-  from = "/.netlify/functions/cors-proxy/*"
-  to = ":splat"
-  status = 200
-  force = true
-  headers = { Host = "api.3commas.io" }
+#[[redirects]]
+ # from = "/.netlify/functions/cors-proxy/*"
+ # to = ":splat"
+ # status = 200
+ # force = true
+#  headers = { Host = "api.3commas.io" }
