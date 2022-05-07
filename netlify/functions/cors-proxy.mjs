@@ -61,9 +61,9 @@ export async function handler (event, context) {
       data: event.body,
       // prevents binary data to be corrupted, doesn't affect json or text data
       responseType: 'arraybuffer',
-      // httpsAgent: new https.Agent({  
-      //   rejectUnauthorized: false
-      // })
+      httpsAgent: new https.Agent({  
+        rejectUnauthorized: false
+      })
       
     })
   } catch (error) {
