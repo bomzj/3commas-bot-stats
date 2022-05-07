@@ -1,6 +1,7 @@
 /* Proxies http(s) requests to any endpoint even if doesn't allow CORS */
 import axios from 'axios'
 import qs from 'qs'
+import https from 'https'
 
 // Serialize query params that represents object with props
 axios.defaults.paramsSerializer = params => qs.stringify(params)
@@ -42,7 +43,7 @@ export async function handler (event, context) {
     console.log('Sending proxied request to', targetUrl, '\n')
     console.log('Request Params:', event.queryStringParameters, '\n')
     // Some servers require Host header to be origin of server, so does Postman
-    //event.headers.host = new URL(targetUrl).host
+    event.headers.host = new URL(targetUrl).host
     console.log('Request Headers:', event.headers, '\n')
 
     var response = await axios(targetUrl, { 
