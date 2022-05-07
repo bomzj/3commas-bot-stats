@@ -2,6 +2,7 @@
 import axios from 'axios'
 import qs from 'qs'
 import https from 'https'
+import http from 'http'
 
 // Serialize query params that represents object with props
 axios.defaults.paramsSerializer = params => qs.stringify(params)
@@ -39,12 +40,19 @@ export async function handler (event, context) {
   const targetUrl = event.path.substring(targetUrlStartIndex)
   
   try {
+    //event.rawUrl
+    //console.log(event.rawUrl)
+    //if (event.protocol == 'http') event.headers.host = new URL(targetUrl).host
+    //else event.headers.host = event.host
+
     console.log('\n')
     console.log('Sending proxied request to', targetUrl, '\n')
     console.log('Request Params:', event.queryStringParameters, '\n')
     // Some servers require Host header to be origin of server, so does Postman
-    event.headers.host = new URL(targetUrl).host
+    //event.headers.host = new URL(targetUrl).host
     console.log('Request Headers:', event.headers, '\n')
+
+
 
     var response = await axios(targetUrl, { 
       method: event.httpMethod,
@@ -53,9 +61,10 @@ export async function handler (event, context) {
       data: event.body,
       // prevents binary data to be corrupted, doesn't affect json or text data
       responseType: 'arraybuffer',
-      httpsAgent: new https.Agent({  
-        rejectUnauthorized: false
-      })
+      // httpsAgent: new https.Agent({  
+      //   rejectUnauthorized: false
+      // })
+      
     })
   } catch (error) {
     console.log(error.toString())
