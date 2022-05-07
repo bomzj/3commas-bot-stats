@@ -38,27 +38,41 @@ export async function handler (event, context) {
   const targetUrl = event.path.substring(targetUrlStartIndex)
   
   try {
+    console.log('\n')
+    console.log('Sending proxied request to', targetUrl, '\n')
+    console.log('Request Params:', event.queryStringParameters, '\n')
+    console.log('Request Headers:', event.headers, '\n')
+
     var response = await axios(targetUrl, { 
       method: event.httpMethod,
-      headers: { ...event.headers }, 
-      // API services may require host header so we probably need to supply it as well as Postman does
-        //'Host' : new URL(targetUrl).host }, 
+      // Mimic Postman behaviour since servers may require Host header
+      headers: { ...event.headers, 'Host' : new URL(targetUrl).host }, 
       params: event.queryStringParameters,
-      data: event.body
+      data: event.body,
+      // prevents binary data to be corrupted, doesn't affect json or text data
+      responseType: 'arraybuffer' 
     })
   } catch (error) {
-    console.error(error)
+    console.log(error.toString())
+    
     return {
-      statusCode: 500, 
-      body: JSON.stringify(error)
+      statusCode: error.response?.status || 500, 
+      body: error.toString()
     }
   }
-
+  
+  let data = response.data?.toString('Base64')
+  
+  console.info('Sending the response back to the client\n')                                       
+  console.log('Response Headers', response.headers, '\n')
+  
   return {
-    statusCode: 200,
+    statusCode: response.status,
     headers: {
+      ...response.headers,
       "Access-Control-Allow-Origin": "*"
     },
-    body: JSON.stringify(response.data)
+    body: data,
+    isBase64Encoded: true
   }
 }

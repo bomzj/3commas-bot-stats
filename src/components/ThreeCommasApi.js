@@ -29,12 +29,12 @@ export default class ThreeCommasAPI {
         {
           method: method,
           timeout: 30000,
+          
           agent: '',
           headers: {
             'APIKEY': this._apiKey,
             'Signature': sig,
-            'Forced-Mode': this._forcedMode,
-            'Host': 'api.3commas.io' // 3commas rejects requests from localhost
+            'Forced-Mode': this._forcedMode
           }
         }
       )

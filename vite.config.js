@@ -17,8 +17,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/.netlify/functions/cors-proxy': {
-        target: 'http://localhost:3001/',       
-        headers: { 'Host': 'api.3commas.io'} // lets fake host due to 3commas rejects requests from localhost
+        target: 'http://localhost:3001/'
       }
     }
   }
