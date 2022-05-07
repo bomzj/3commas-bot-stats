@@ -42,7 +42,7 @@ export async function handler (event, context) {
     console.log('Sending proxied request to', targetUrl, '\n')
     console.log('Request Params:', event.queryStringParameters, '\n')
     // Some servers require Host header to be origin of server, so does Postman
-    event.headers.host = 'api.3commas.io'
+    //event.headers.host = new URL(targetUrl).host
     console.log('Request Headers:', event.headers, '\n')
 
     var response = await axios(targetUrl, { 
