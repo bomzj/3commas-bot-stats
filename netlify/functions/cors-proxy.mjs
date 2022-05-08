@@ -46,13 +46,12 @@ export async function handler (event, context) {
     console.log('Request Params:', event.queryStringParameters, '\n')
     console.log('Request Headers:', event.headers, '\n')
 
+    // Remove Host header that can cause failure in HTTPS handshake
+    delete event.headers.host
+
     var response = await axios(targetUrl, { 
       method: event.httpMethod,
-      headers: {
-        'APIKEY': event.headers['apikey'],
-        'Signature': event.headers['signature'],
-        'Forced-Mode':  event.headers['forced-mode']
-      },
+      headers: event.headers,
       // Workaround for 3commas requires correct order of query string parameters, but 
       // Netlify functions is running old Node runtime that changes order 
       // of query string parameters.
