@@ -53,7 +53,10 @@ export async function handler (event, context) {
     //event.headers.host = new URL(targetUrl).host
     console.log('Request Headers:', event.headers, '\n')
 
-    var response = await axios('https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/1024px-Image_created_with_a_mobile_phone.png')
+    var response = await axios('https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/1024px-Image_created_with_a_mobile_phone.png',
+    {
+      responseType: 'arraybuffer',
+    })
     console.log(response.data.length)
 
     // // var response = await axios(targetUrl, { 
