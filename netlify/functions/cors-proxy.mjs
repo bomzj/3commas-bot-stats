@@ -53,9 +53,15 @@ export async function handler (event, context) {
     //event.headers.host = new URL(targetUrl).host
     console.log('Request Headers:', event.headers, '\n')
 
+    console.log(event.headers['apikey'], event.headers['signature'], event.headers['forced-mode'])
     var response = await axios(targetUrl, { 
       method: event.httpMethod,
-      //headers: event.headers, 
+      headers: {
+        'APIKEY': event.headers['apikey'],
+        'Signature': event.headers['signature'],
+        'Forced-Mode':  event.headers['forced-mode']
+  
+      } ,
       params: event.queryStringParameters,
       data: event.body,
       // prevents binary data to be corrupted, doesn't affect json or text data
