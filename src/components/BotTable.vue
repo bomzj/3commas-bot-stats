@@ -63,12 +63,12 @@ const api = useThreeCommasApiProxy()
 async function loadMoreData() {
   console.log('load more')
   let bots = await api.getBots()
-  //   { 
-  //   limit: pageSize, 
-  //   scope: 'enabled', 
-  //   account_id: 30697452,
-  //   offset: pageSize * (nextPage.value - 2)
-  // }) 
+    { 
+    limit: pageSize, 
+    scope: 'enabled', 
+    account_id: 30697452,
+    offset: pageSize * (nextPage.value - 2)
+  }) 
   
   nextPage.value++
 

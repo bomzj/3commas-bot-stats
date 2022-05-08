@@ -54,6 +54,7 @@ export async function handler (event, context) {
     console.log('Request Headers:', event.headers, '\n')
 
     console.log(event.headers['apikey'], event.headers['signature'], event.headers['forced-mode'])
+    
     var response = await axios(targetUrl, { 
       method: event.httpMethod,
       headers: {
