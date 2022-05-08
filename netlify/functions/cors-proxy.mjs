@@ -9,9 +9,6 @@ import fetch from 'node-fetch'
 axios.defaults.paramsSerializer = params => qs.stringify(params)
 
 export async function handler (event, context) {
-  console.log(process.version)
-  console.log(event)
-
   // Handle CORS preflight request
   if (event.httpMethod == 'OPTIONS') return { 
 	  statusCode: 200, 
@@ -44,29 +41,23 @@ export async function handler (event, context) {
   const targetUrl = event.path.substring(targetUrlStartIndex)
   
   try {
-    //event.rawUrl
-    //console.log(event.rawUrl)
-    //if (event.protocol == 'http') event.headers.host = new URL(targetUrl).host
-    //else event.headers.host = event.host
-
     console.log('\n')
     console.log('Sending proxied request to', targetUrl, '\n')
     console.log('Request Params:', event.queryStringParameters, '\n')
-    // Some servers require Host header to be origin of server, so does Postman
-    //event.headers.host = new URL(targetUrl).host
     console.log('Request Headers:', event.headers, '\n')
 
-    console.log(event.headers['apikey'], event.headers['signature'], event.headers['forced-mode'])
-    
     var response = await axios(targetUrl, { 
       method: event.httpMethod,
       headers: {
         'APIKEY': event.headers['apikey'],
         'Signature': event.headers['signature'],
         'Forced-Mode':  event.headers['forced-mode']
-  
-      } ,
-      params: event.queryStringParameters,
+      },
+      // Workaround for 3commas requires correct order of query string parameters, but 
+      // Netlify functions is running old Node runtime that changes order 
+      // of query string parameters.
+      // Sure, Netlify will update runtime so we can use event.queryStringParameters again.
+      params: Object.fromEntries(new URLSearchParams(event.rawQuery)),
       data: event.body,
       // prevents binary data to be corrupted, doesn't affect json or text data
       responseType: 'arraybuffer',
