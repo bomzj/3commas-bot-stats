@@ -9,6 +9,9 @@ import fetch from 'node-fetch'
 axios.defaults.paramsSerializer = params => qs.stringify(params)
 
 export async function handler (event, context) {
+  console.log(process.version)
+  console.log(event)
+
   // Handle CORS preflight request
   if (event.httpMethod == 'OPTIONS') return { 
 	  statusCode: 200, 
