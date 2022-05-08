@@ -86,7 +86,7 @@ async function preloadData() {
   }
 }
 
-//preloadData()
+preloadData()
 
 async function onScroll({ to, ref }) {
   const lastIndex = rows.value.length - 1

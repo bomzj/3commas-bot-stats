@@ -20,7 +20,7 @@ export default defineConfig({
       '/.netlify/functions/cors-proxy': {
         //target: 'https://3commas-bot-stats.netlify.app'
         target: 'http://localhost:3001',
-        headers: { host: 'api.3commas.io' },
+        //headers: { host: 'api.3commas.io' },
         
       }
     }
