@@ -20,6 +20,16 @@
 <script setup>
 import { ref, computed, nextTick } from 'vue'
 import useThreeCommasApiProxy from './ThreeCommasApiProxy'
+import axios from 'axios'
+
+async function test() {
+  let wiki = await axios('https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/1024px-Image_created_with_a_mobile_phone.png')
+
+  console.log(wiki.status)
+  console.log(wiki.data.length)
+}
+
+test()
 
 const columns = [
   {

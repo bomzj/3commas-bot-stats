@@ -3,6 +3,7 @@ import axios from 'axios'
 import qs from 'qs'
 import https from 'https'
 import http from 'http'
+import fetch from 'node-fetch'
 
 // Serialize query params that represents object with props
 axios.defaults.paramsSerializer = params => qs.stringify(params)
@@ -52,7 +53,7 @@ export async function handler (event, context) {
     //event.headers.host = new URL(targetUrl).host
     console.log('Request Headers:', event.headers, '\n')
 
-
+    //fetch()
 
     var response = await axios(targetUrl, { 
       method: event.httpMethod,
