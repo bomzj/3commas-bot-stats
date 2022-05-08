@@ -62,7 +62,8 @@ const api = useThreeCommasApiProxy()
 
 async function loadMoreData() {
   console.log('load more')
-  let bots = await api.getBots()
+  
+  let bots = await api.getBots(
     { 
     limit: pageSize, 
     scope: 'enabled', 
