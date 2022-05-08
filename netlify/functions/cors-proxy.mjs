@@ -53,22 +53,23 @@ export async function handler (event, context) {
     //event.headers.host = new URL(targetUrl).host
     console.log('Request Headers:', event.headers, '\n')
 
-    //fetch()
+    var response = await axios('https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/1024px-Image_created_with_a_mobile_phone.png')
+    console.log(response.data.length)
 
-    var response = await axios(targetUrl, { 
-      method: event.httpMethod,
-      headers: event.headers, 
-      params: event.queryStringParameters,
-      data: event.body,
-      // prevents binary data to be corrupted, doesn't affect json or text data
-      responseType: 'arraybuffer',
-      httpsAgent: new https.Agent({  
-        //rejectUnauthorized: false,
-        checkServerIdentity: () => undefined
+    // // var response = await axios(targetUrl, { 
+    // //   method: event.httpMethod,
+    // //   headers: event.headers, 
+    // //   params: event.queryStringParameters,
+    // //   data: event.body,
+    // //   // prevents binary data to be corrupted, doesn't affect json or text data
+    // //   responseType: 'arraybuffer',
+    // //   httpsAgent: new https.Agent({  
+    // //     //rejectUnauthorized: false,
+    // //     checkServerIdentity: () => undefined
         
-      })
+    // //   })
       
-    })
+    // })
   } catch (error) {
     console.log(error.toString())
     
