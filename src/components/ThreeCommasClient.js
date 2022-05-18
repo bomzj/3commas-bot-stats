@@ -5,7 +5,7 @@ const signature = (secret, path, params) =>
 
 const API_URL = 'https://api.3commas.io'
 
-export default class ThreeCommasAPI {
+export default class ThreeCommasClient {
   constructor(opts = {}) {
     this._url = opts.url || API_URL
     this._apiKey = opts.apiKey || ''
@@ -24,20 +24,30 @@ export default class ThreeCommasAPI {
     const sig = signature(this._apiSecret, path, queryParams.toString())
 
     try {
-      let response = await fetch(
-        `${this._url}${path}${queryParams.toString()}`,
-        {
-          method: method,
-          timeout: 30000,
-          
-          agent: '',
-          headers: {
-            'APIKEY': this._apiKey,
-            'Signature': sig,
-            'Forced-Mode': this._forcedMode
-          }
-        }
-      )
+      let i = 0
+      
+      do {
+        var response = await fetch(
+          `${this._url}${path}${queryParams.toString()}`,
+          {
+            method: method,
+            timeout: 30000,
+            agent: '',
+            headers: {
+              'APIKEY': this._apiKey,
+              'Signature': sig,
+              'Forced-Mode': this._forcedMode
+            }
+          })
+
+          i++
+        // Retry failed request up to 3 times 
+      } while (response.status == 502 && i < 3)
+
+      if (response.status == 502) {
+        console.error('Request failed 3 times. No data received for', response.url)
+        console.log('Please sync again!')
+      }
 
       return await response.json()
     } catch (e) {
@@ -242,4 +252,19 @@ export default class ThreeCommasAPI {
     return await this.makeRequest('POST', `/public/api/ver1/accounts/${account_id}/remove?`, { account_id })
   }
 
+}
+
+export function useThreeCommasClient(isPaperTradingMode) {
+  let apiKey = "f56d6fc78bce470395f266edce60b8eeee549b927456481f84d81dfcdd6e24a4"
+  let apiSecret = "51ec2f23fe7c257db536a76c3d619ed0c4b69fe923bdb817b43966ceee52fde12d06a0461c2837914ba61a464eb31fed3e4f9182b3fe3f865d55d23889f5851dfb7cfbd46a162fe13ce117c30ab3f4137adb9cd359d10fd6bf65378d61cd1eb3388b5206"
+  let proxyPath = '/.netlify/functions/cors-proxy/https://api.3commas.io'
+
+  let api = new ThreeCommasClient({
+      url: proxyPath,
+      apiKey: apiKey,
+      apiSecret: apiSecret,
+      forcedMode: isPaperTradingMode ? 'paper' : ''
+  })
+
+  return api
 }

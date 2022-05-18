@@ -46,7 +46,8 @@ export async function handler (event, context) {
     console.log('Request Params:', event.queryStringParameters, '\n')
     console.log('Request Headers:', event.headers, '\n')
 
-    // Remove Host header that can cause failure in HTTPS handshake
+    // Remove Host header that can cause failure in HTTPS handshake,
+    // TODO: check whether some Headers affect that behaviour
     delete event.headers.host
 
     var response = await axios(targetUrl, { 

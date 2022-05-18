@@ -1,5 +1,7 @@
 <script setup>
 import BotTable from './components/BotTable.vue'
+
+import SyncButton from './components/SyncButton.vue';
 </script>
 
 <template>
@@ -11,8 +13,9 @@ import BotTable from './components/BotTable.vue'
           <q-avatar>
             <img src="https://cdn.quasar.dev/logo-v2/svg/logo-mono-white.svg">
           </q-avatar>
-          Title
+          3Commas Bot Stats
         </q-toolbar-title>
+       <SyncButton />
       </q-toolbar>
     </q-header>
 
@@ -26,7 +29,7 @@ import BotTable from './components/BotTable.vue'
           <q-avatar>
             <img src="https://cdn.quasar.dev/logo-v2/svg/logo-mono-white.svg">
           </q-avatar>
-          <div>Title</div>
+          <div>3Commas Bot Stats</div>
         </q-toolbar-title>
       </q-toolbar>
     </q-footer>

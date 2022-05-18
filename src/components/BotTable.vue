@@ -1,25 +1,8 @@
-<template>
-  <div class="q-pa-md">
-    <q-table
-      class="my-sticky-dynamic"
-      title="Bots"
-      :rows="rows"
-      :columns="columns"
-      :loading="loading"
-      row-key="index"
-      virtual-scroll
-      :virtual-scroll-item-size="48"
-      :virtual-scroll-sticky-size-start="48"
-      :pagination="pagination"
-      :rows-per-page-options="[0]"
-      @virtual-scroll="onScroll"
-    />
-  </div>
-</template>
-
 <script setup>
-import { ref, computed, nextTick } from 'vue'
-import useThreeCommasApiProxy from './ThreeCommasApiProxy'
+import { ref, computed, nextTick, watch } from 'vue'
+import { useThreeCommasClient } from './ThreeCommasClient'
+import { formatCurrency } from './CurrencyFormatter'
+import { store } from './store';
 
 const columns = [
   {
@@ -36,35 +19,59 @@ const columns = [
     format: val => val,
     sortable: true
   },
-  { name: 'calories', align: 'center', label: 'Calories', field: 'calories', sortable: true },
-  { name: 'fat', label: 'Fat (g)', field: 'fat', sortable: true },
-  { name: 'carbs', label: 'Carbs (g)', field: 'carbs' },
-  { name: 'protein', label: 'Protein (g)', field: 'protein' },
-  { name: 'sodium', label: 'Sodium (mg)', field: 'sodium' },
-  { name: 'calcium', label: 'Calcium (%)', field: 'calcium', sortable: true, sort: (a, b) => parseInt(a, 10) - parseInt(b, 10) },
-  { name: 'iron', label: 'Iron (%)', field: 'iron', sortable: true, sort: (a, b) => parseInt(a, 10) - parseInt(b, 10) }
+  { name: '24hProfit', align: 'center', label: '24h', field: 'calories', sortable: true },
+  { name: '7daysProfit', label: '7 days', field: 'fat', sortable: true },
+  { name: '30daysProfit', label: '30 days', field: 'fat', sortable: true },
+  { name: 'dailyProfit', label: 'Daily profit', field: 'carbs' },
+  { 
+    name: 'completedDealsProfit', 
+    label: 'Completed deals profit', 
+    field: 'finished_deals_profit_usd',
+    format: (val, row) => formatCurrency(val, 'USD'),
+  },
+  { 
+    name: 'Monthly ROI', 
+    label: 'Monthly ROI (%)', 
+    field: 'iron', sortable: true, 
+    sort: (a, b) =>  a - b },
+  { 
+    name: 'uPNL', 
+    label: 'uPNL of active deals', 
+    field: 'active_deals_usd_profit', 
+    sortable: true, 
+    sort: (a, b) => a - b,
+    format: (val, row) => formatCurrency(val, 'USD'),
+  },
+  { 
+    name: 'fundsLocked', 
+    label: 'Funds locked in deals', 
+    field: 'sodium',
+    format: (val, row) => formatCurrency(val, 'USD'),
+  },
 ]
-
-
 
 // allRows.value.forEach((row, index) => {
 //   row.index = index
 // })
 
-const rows = ref([])
+const rows = ref(store.bots)
 const pageSize = 50
 const nextPage = ref(2)
 let lastPage = 3
 const pagination = { rowsPerPage: 0 }
 
 const loading = ref(false)
-const api = useThreeCommasApiProxy()
+const api = useThreeCommasClient()
+
+watch(store, () => {
+  console.log('bots loaded into table')
+  rows.value.push(...store.bots)
+})
 
 async function loadMoreData() {
   console.log('load more')
   
-  let bots = await api.getBots(
-    { 
+  let bots = await api.getBots({ 
     limit: pageSize, 
     scope: 'enabled', 
     account_id: 30697452,
@@ -80,25 +87,15 @@ async function loadMoreData() {
   //console.log(bots)
 }
 
-async function preloadData() {
-  // Warm up Netlify functions to avoid Timeout issues
-  try {
-    await api.getAccount(30697452)
-  } finally {
-  }
-}
-
-preloadData()
-
 async function onScroll({ to, ref }) {
   const lastIndex = rows.value.length - 1
 
   console.log('onScroll to before refresh() ' + to)
 
   if (loading.value !== true && nextPage.value < lastPage && to === lastIndex) {
-    loading.value = true
-    await loadMoreData()
-    loading.value = false
+    // loading.value = true
+    // await loadMoreData()
+    // loading.value = false
     //  nextTick(() => {
     //   ref.refresh()
     //   loading.value = false
@@ -107,10 +104,28 @@ async function onScroll({ to, ref }) {
 }
 </script>
 
+<template>
+  <div class="q-pa-md">
+    <q-table
+      class="my-sticky-dynamic"
+      title="Bots"
+      :rows="rows"
+      :columns="columns"
+      :loading="loading"
+      row-key="index"
+      virtual-scroll
+      :virtual-scroll-item-size="48"
+      :virtual-scroll-sticky-size-start="48"
+      :pagination="pagination"
+      :rows-per-page-options="[0]"
+      @virtual-scroll="onScroll" />
+  </div>
+</template>
+
 <style lang="sass">
 .my-sticky-dynamic
   /* height or max-height is important */
-  height: 410px
+  /* height: 410px */
 
   .q-table__top,
   .q-table__bottom,

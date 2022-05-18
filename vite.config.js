@@ -18,10 +18,11 @@ export default defineConfig({
     proxy: {
       // Netlify functions server on localhost has a bug that crashes every 5-10 mins, so we have to use Live server instead
       '/.netlify/functions/cors-proxy': {
-        //target: 'https://3commas-bot-stats.netlify.app'
-        target: 'http://localhost:3001',
-        //headers: { host: 'api.3commas.io' },
-        
+        // Netlify functions dev server has bug that crashes each 5 mins or so, 
+        // we have to use Live server
+        target: 'https://3commas-bot-stats.netlify.app',
+        headers: { host: '3commas-bot-stats.netlify.app' },
+        //target: 'http://localhost:3001', 
       }
     }
   }
