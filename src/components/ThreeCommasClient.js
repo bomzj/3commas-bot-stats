@@ -13,7 +13,7 @@ export default class ThreeCommasClient {
     this._forcedMode = opts.forcedMode || 'real'
   }
 
-  async makeRequest (method, path, params) {
+  async makeRequest(method, path, params) {
     if (!this._apiKey || !this._apiSecret) {
       return new Error('missing api key or secret')
     }
@@ -37,7 +37,7 @@ export default class ThreeCommasClient {
               'APIKEY': this._apiKey,
               'Signature': sig,
               'Forced-Mode': this._forcedMode
-            }
+            },
           })
 
           i++
@@ -46,7 +46,7 @@ export default class ThreeCommasClient {
 
       if (response.status == 502) {
         console.error('Request failed 3 times. No data received for', response.url)
-        console.log('Please sync again!')
+        console.log('Please, delete old data and sync again!')
       }
 
       return await response.json()
@@ -254,7 +254,7 @@ export default class ThreeCommasClient {
 
 }
 
-export function useThreeCommasClient(isPaperTradingMode) {
+export function useThreeCommasClient(mode = 'real') {
   let apiKey = "f56d6fc78bce470395f266edce60b8eeee549b927456481f84d81dfcdd6e24a4"
   let apiSecret = "51ec2f23fe7c257db536a76c3d619ed0c4b69fe923bdb817b43966ceee52fde12d06a0461c2837914ba61a464eb31fed3e4f9182b3fe3f865d55d23889f5851dfb7cfbd46a162fe13ce117c30ab3f4137adb9cd359d10fd6bf65378d61cd1eb3388b5206"
   let proxyPath = '/.netlify/functions/cors-proxy/https://api.3commas.io'
@@ -263,7 +263,7 @@ export function useThreeCommasClient(isPaperTradingMode) {
       url: proxyPath,
       apiKey: apiKey,
       apiSecret: apiSecret,
-      forcedMode: isPaperTradingMode ? 'paper' : ''
+      forcedMode: mode // real or paper
   })
 
   return api

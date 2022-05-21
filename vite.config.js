@@ -21,8 +21,7 @@ export default defineConfig({
         // Netlify functions dev server has bug that crashes each 5 mins or so, 
         // we have to use Live server
         target: 'https://3commas-bot-stats.netlify.app',
-        headers: { host: '3commas-bot-stats.netlify.app' },
-        //target: 'http://localhost:3001', 
+        headers: { host: '3commas-bot-stats.netlify.app' }
       }
     }
   }

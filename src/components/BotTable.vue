@@ -2,7 +2,7 @@
 import { ref, computed, nextTick, watch } from 'vue'
 import { useThreeCommasClient } from './ThreeCommasClient'
 import { formatCurrency } from './CurrencyFormatter'
-import { store } from './store';
+import { getAllBots } from './ThreeCommasDataCache'
 
 const columns = [
   {
@@ -53,8 +53,13 @@ const columns = [
 // allRows.value.forEach((row, index) => {
 //   row.index = index
 // })
+// let botsStats = await useThreeCommasClient('paper').getBotsStats({bot_id: 9003027})
+// let accounts = await useThreeCommasClient('real').accounts()
 
-const rows = ref(store.bots)
+// let bots = await getAllBots()
+// console.log(bots.length)
+
+const rows = ref([])
 const pageSize = 50
 const nextPage = ref(2)
 let lastPage = 3
@@ -63,10 +68,10 @@ const pagination = { rowsPerPage: 0 }
 const loading = ref(false)
 const api = useThreeCommasClient()
 
-watch(store, () => {
-  console.log('bots loaded into table')
-  rows.value.push(...store.bots)
-})
+// watch(store, () => {
+//   console.log('bots loaded into table')
+//   rows.value.push(...store.bots)
+// })
 
 async function loadMoreData() {
   console.log('load more')

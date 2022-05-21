@@ -1,15 +1,12 @@
 <script setup>
 import { ref, watch, watchEffect } from 'vue'
-import { store, syncBots, syncDeals }  from './store'
-
-//let botsStats = await api.getBotsStats({bot_id: 8931661})
+import { syncAll }  from './ThreeCommasDataSync'
 
 let loading = ref(false)
 
 async function onClick() {
   loading.value = true
-  await syncBots()
-  await syncDeals()
+  await syncAll()
   loading.value = false
 }
 </script>
