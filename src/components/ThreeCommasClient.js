@@ -42,7 +42,7 @@ export default class ThreeCommasClient {
 
           i++
         // Retry failed request up to 3 times 
-      } while (response.status == 502 && i < 3)
+      } while (response.status == 500 && i < 3)
 
       if (response.status == 502) {
         console.error('Request failed 3 times. No data received for', response.url)

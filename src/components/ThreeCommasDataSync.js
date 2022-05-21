@@ -30,7 +30,7 @@ export async function syncBots(resync = false) {
 export async function syncDeals(resync = false) {
   if (resync) await deleteDeals()
   let offset = resync ? 0 : 0//getDealsCount()
-  syncData('getDeals', 500, offset, cacheDeals)
+  syncData('getDeals', 1000, offset, cacheDeals)
 }
 
 async function syncData(apiCallback, apiParams, cacheDataCallback) {
