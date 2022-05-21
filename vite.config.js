@@ -17,17 +17,17 @@ export default defineConfig({
   ],
 
   build: {
+    // fix vite build crash due to using of top level await
     target: 'esnext'
   },
 
   server: {
     proxy: {
-      // Netlify functions server on localhost has a bug that crashes every 5-10 mins, so we have to use Live server instead
-      '/.netlify/functions/cors-proxy': {
-        // Netlify functions dev server has bug that crashes each 5 mins or so, 
-        // we have to use Live server
-        target: 'https://3commas-bot-stats.netlify.app',
-        headers: { host: '3commas-bot-stats.netlify.app' }
+      // Overcome 3commas cors issues
+      '/api/3commas': {
+        target: 'https://api.3commas.io',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/3commas/, ''),
       }
     }
   }
