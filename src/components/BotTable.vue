@@ -56,6 +56,14 @@ const columns = [
 // let botsStats = await useThreeCommasClient('paper').getBotsStats({bot_id: 9003027})
 // let accounts = await useThreeCommasClient('real').accounts()
 
+// let activeDeals = await useThreeCommasClient('paper').getDeals({ scope: 'active'})
+// let finishedDeals = await useThreeCommasClient('paper').getDeals({ scope: 'finished'})
+// let completedDeals = await useThreeCommasClient('paper').getDeals({ scope: 'completed'})
+// let cancelledDeals = await useThreeCommasClient('paper').getDeals({ scope: 'cancelled'})
+// let failedDeals = await useThreeCommasClient('paper').getDeals({ scope: 'failed'})
+
+let sortedDeals = await useThreeCommasClient('paper').getDeals({ offset: 150000, order: 'closed_at', order_direction: 'asc', limit: 1000})
+
 // let bots = await getAllBots()
 // console.log(bots.length)
 

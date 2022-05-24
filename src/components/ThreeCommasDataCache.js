@@ -3,11 +3,11 @@ import { openDB } from 'idb'
 // Init Indexed DB to store bots/deals
 let db = await openDB('3CommasCache', 1, {
   upgrade(db) {
+    db.createObjectStore('accounts', { keyPath: 'id' })
     db.createObjectStore('bots', { keyPath: 'id' })
-      .createIndex('custom', ['account_name', 'account_id'])
     
     db.createObjectStore('deals', { keyPath: 'id' })
-    
+      .createIndex('closed_at', 'closed_at')
   }
 })
 
@@ -27,12 +27,29 @@ export async function deleteBots() {
   return await db.clear('bots')
 }
 
-export async function getDeals(botId) {
+export async function getBotDeals(botId, dealStatus) {
   //return await db.getAll('bots')
 }
 
-export async function getDealsCount() {
+/**
+ * Returns total count of deals filtered by:
+ * @param botId bot specified deals or undefined to return all deals
+ * @param dealStatus possible values: [active, completed] or undefined 
+ */
+export async function getAllDealsCount() {
   return await db.count('deals')
+}
+
+export async function getActiveDealsCount() {
+  let [totalCount, finishedCount] = await Promise.all([
+    getAllDealsCount(), 
+    getAllFinishedDealsCount()])
+
+  return totalCount - finishedCount
+}
+
+export async function getAllFinishedDealsCount() {
+  return await db.countFromIndex('deals', 'closed_at', IDBKeyRange.lowerBound(' '))
 }
 
 export async function deleteDeals() {

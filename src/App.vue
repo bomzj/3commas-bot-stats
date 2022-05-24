@@ -1,6 +1,5 @@
 <script setup>
 import BotTable from './components/BotTable.vue'
-
 import SyncButton from './components/SyncButton.vue';
 </script>
 
