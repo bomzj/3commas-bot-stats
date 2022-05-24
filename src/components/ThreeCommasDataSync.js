@@ -1,14 +1,19 @@
 import { useThreeCommasClient } from './ThreeCommasClient'
-import { cacheBots, 
+import { cacheAccounts,
+         cacheBots, 
          cacheDeals, 
-         getBotsCount, 
-         getAllDealsCount,
-         getAllFinishedDealsCount, 
-         deleteBots,
-         deleteDeals } from './ThreeCommasDataCache'
+         getAllFinishedDealsCount } from './ThreeCommasDataCache'
 
 const realApi = useThreeCommasClient('real')
 const paperApi = useThreeCommasClient('paper')
+
+export async function syncAccounts(progressCallback) {
+  let params = { per_page: 100 }
+  await syncData(realApi.accounts.bind(realApi), { ...params }, cacheAccounts, progressCallback, 1)
+  await syncData(paperApi.accounts.bind(paperApi), { ...params }, cacheAccounts, progressCallback, 1)
+  // Let subscriber know that task is finished
+  progressCallback([], true)
+}
 
 export async function syncBots(progressCallback) {
   let params = { limit: 100, offset: 0 }
@@ -29,14 +34,17 @@ export async function syncDeals(progressCallback) {
   progressCallback([], true)
 }
 
-async function syncData(apiCallback, apiParams, cacheDataCallback, progressCallback) {
-  // Browser can make 6 HTTP/1 connections per domain at a time
-  const runningRequestsBrowserLimit = 6
-
+async function syncData(apiCallback, 
+                        apiParams, 
+                        cacheDataCallback, 
+                        progressCallback,
+                        // Default to max number of HTTP/1 connections per domain at a time
+                        // Browser can make
+                        pendingRequestsLimit = 6) {
   do {
     let requests = []
 
-    for (let i = 0; i < runningRequestsBrowserLimit; i++) {
+    for (let i = 0; i < pendingRequestsLimit; i++) {
       let request = apiCallback(apiParams)
       requests.push(request)
       apiParams.offset += apiParams.limit
@@ -48,6 +56,6 @@ async function syncData(apiCallback, apiParams, cacheDataCallback, progressCallb
     // Notify subscriber that new data chunk received
     progressCallback(data)
 
-    var hasMoreData = data.length == runningRequestsBrowserLimit * apiParams.limit
+    var hasMoreData = data.length == pendingRequestsLimit * apiParams.limit
   } while (hasMoreData)
 }

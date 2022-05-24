@@ -1,15 +1,16 @@
 <script setup>
 import { ref, watch, watchEffect } from 'vue'
 import { useQuasar } from 'quasar'
-import { syncBots, syncDeals }  from './ThreeCommasDataSync'
+import { syncAccounts, syncBots, syncDeals }  from './ThreeCommasDataSync'
 
 const $q = useQuasar()
 let syncing = ref(false)
 
 async function syncData() {
   syncing.value = true
+  await syncAccounts(createProgressHandler('accounts'))
   await syncBots(createProgressHandler('bots'))
-  await syncDeals(createProgressHandler('deals'))
+  //await syncDeals(createProgressHandler('deals'))
   syncing.value = false
 }
 

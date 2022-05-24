@@ -56,6 +56,10 @@ export async function deleteDeals() {
   return await db.clear('deals')
 }
 
+export async function cacheAccounts(accounts) {
+  return await cacheItems(accounts, 'accounts')
+}
+
 export async function cacheBots(bots) {
   return await cacheItems(bots, 'bots')
 }
