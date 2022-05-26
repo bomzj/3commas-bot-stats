@@ -1,30 +1,37 @@
-import { openDB } from 'idb'
+import { openDB } from 'idb/with-async-ittr'
 
-// Init Indexed DB to store bots/deals
-let db = await openDB('3CommasCache', 1, {
-  upgrade(db) {
-    db.createObjectStore('accounts', { keyPath: 'id' })
-    db.createObjectStore('bots', { keyPath: 'id' })
-    
-    db.createObjectStore('deals', { keyPath: 'id' })
-      .createIndex('closed_at', 'closed_at')
-  }
-})
+let realDb = await openDb('3CommasRealCache')
+let paperDb = await openDb('3CommasPaperCache')
+
+function openDb(name) {
+  return openDB(name, 1, {
+    upgrade(db) {
+      db.createObjectStore('accounts', { keyPath: 'id' })
+      db.createObjectStore('bots', { keyPath: 'id' })
+      
+      db.createObjectStore('deals', { keyPath: 'id' })
+        .createIndex('closed_at', 'closed_at')
+    }
+  })
+}
+
+export async function getRealAccounts() { return realDb.getAll('accounts') }
+export async function getPaperAccount() { return paperDb.getAll('accounts') }
 
 export async function getAllBots() {
-  let tx = db.transaction('bots', 'readonly')
+  let tx = realDb.transaction('bots', 'readonly')
   //return await tx.store.index('custom').getAll(IDBKeyRange.only(31457974))
   //return db.getAllFromIndex('bots', 'custom', IDBKeyRange.only('Kucoin31457974'))
-  return db.getAllFromIndex('bots', 'custom', IDBKeyRange.only(['Kucoin']))
+  return realDb.getAllFromIndex('bots', 'custom', IDBKeyRange.only(['Kucoin']))
   //return await db.getAll('bots',  IDBKeyRange.only(8031804))
 }
 
 export async function getBotsCount() {
-  return await  db.count('bots', IDBKeyRange.only())
+  return await  realDb.count('bots', IDBKeyRange.only())
 }
 
 export async function deleteBots() {
-  return await db.clear('bots')
+  return await realDb.clear('bots')
 }
 
 export async function getBotDeals(botId, dealStatus) {
@@ -37,38 +44,54 @@ export async function getBotDeals(botId, dealStatus) {
  * @param dealStatus possible values: [active, completed] or undefined 
  */
 export async function getAllDealsCount() {
-  return await db.count('deals')
+  return await realDb.count('deals')
 }
 
 export async function getActiveDealsCount() {
-  let [totalCount, finishedCount] = await Promise.all([
-    getAllDealsCount(), 
-    getAllFinishedDealsCount()])
-
-  return totalCount - finishedCount
+ 
 }
 
-export async function getAllFinishedDealsCount() {
-  return await db.countFromIndex('deals', 'closed_at', IDBKeyRange.lowerBound(' '))
+export async function getFinishedRealDealsCount() { 
+  return getFinishedDealsCount(realDb) 
+}
+
+export async function getFinishedPaperDealsCount() {
+  return getFinishedDealsCount(paperDb) 
+}
+
+async function getFinishedDealsCount(db = realDb) {
+  return db.countFromIndex('deals', 'closed_at', IDBKeyRange.lowerBound(' '))
 }
 
 export async function deleteDeals() {
-  return await db.clear('deals')
+  return await realDb.clear('deals')
 }
 
-export async function cacheAccounts(accounts) {
-  return await cacheItems(accounts, 'accounts')
+export async function cacheRealAccounts(accounts) {
+  return await cacheItems(accounts, 'accounts', realDb)
 }
 
-export async function cacheBots(bots) {
-  return await cacheItems(bots, 'bots')
+export async function cachePaperAccounts(accounts) {
+  return await cacheItems(accounts, 'accounts', paperDb)
 }
 
-export async function cacheDeals(deals) {
-  return await cacheItems(deals, 'deals')
+export async function cacheRealBots(bots) {
+  return await cacheItems(bots, 'bots', realDb)
 }
 
-async function cacheItems(items, storeName) {
+export async function cachePaperBots(bots) {
+  return await cacheItems(bots, 'bots', paperDb)
+}
+
+export async function cacheRealDeals(deals) {
+  return await cacheItems(deals, 'deals', realDb)
+}
+
+export async function cachePaperDeals(deals) {
+  return await cacheItems(deals, 'deals', paperDb)
+}
+
+async function cacheItems(items, storeName, db = realDb) {
   let tx = db.transaction(storeName, 'readwrite')
 
   for (let item of items) 

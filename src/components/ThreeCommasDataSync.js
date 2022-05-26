@@ -1,37 +1,61 @@
 import { useThreeCommasClient } from './ThreeCommasClient'
-import { cacheAccounts,
-         cacheBots, 
-         cacheDeals, 
-         getAllFinishedDealsCount } from './ThreeCommasDataCache'
+import { cacheRealAccounts, cachePaperAccounts,
+         cacheRealBots, cachePaperBots,
+         cacheRealDeals, cachePaperDeals, 
+         getFinishedRealDealsCount,
+         getFinishedPaperDealsCount } from './ThreeCommasDataCache'
 
 const realApi = useThreeCommasClient('real')
 const paperApi = useThreeCommasClient('paper')
 
 export async function syncAccounts(progressCallback) {
   let params = { per_page: 100 }
-  await syncData(realApi.accounts.bind(realApi), { ...params }, cacheAccounts, progressCallback, 1)
-  await syncData(paperApi.accounts.bind(paperApi), { ...params }, cacheAccounts, progressCallback, 1)
-  // Let subscriber know that task is finished
-  progressCallback([], true)
+  
+  await syncData(realApi.accounts.bind(realApi), 
+                 { ...params }, 
+                 cacheRealAccounts, 
+                 progressCallback, 
+                 1)
+  
+  await syncData(paperApi.accounts.bind(paperApi), 
+                 { ...params }, 
+                 cachePaperAccounts, 
+                 progressCallback, 
+                 1)
 }
 
 export async function syncBots(progressCallback) {
   let params = { limit: 100, offset: 0 }
-  await syncData(realApi.getBots.bind(realApi), { ...params }, cacheBots, progressCallback)
-  await syncData(paperApi.getBots.bind(paperApi), { ...params }, cacheBots, progressCallback)
-  // Let subscriber know that task is finished
-  progressCallback([], true)
+  
+  await syncData(realApi.getBots.bind(realApi), 
+                 { ...params }, 
+                 cacheRealBots, 
+                 progressCallback, 
+                 1)
+
+  await syncData(paperApi.getBots.bind(paperApi), 
+                 { ...params }, 
+                 cachePaperBots, 
+                 progressCallback, 
+                 1)
 }
 
 export async function syncDeals(progressCallback) {
   // Calculate next offset to perform incremental smart sync instead of full resync 
-  let offset = await getAllFinishedDealsCount()
-  let params = { limit: 1000, offset, order: 'closed_at', order_direction: 'asc' }
+  let paperOffset = await getFinishedPaperDealsCount()
+  let realOffset = await getFinishedRealDealsCount()
+  let params = { limit: 1000, order: 'closed_at', order_direction: 'asc' }
+  console.log('realOffset', realOffset, 'paperOffset', paperOffset)
   
-  await syncData(realApi.getDeals.bind(realApi), { ...params }, cacheDeals, progressCallback)
-  await syncData(paperApi.getDeals.bind(paperApi), { ...params }, cacheDeals, progressCallback)
-  // Let subscriber know that task is finished
-  progressCallback([], true)
+  await syncData(realApi.getDeals.bind(realApi), 
+                 { ...params, offset: realOffset }, 
+                 cacheRealDeals, 
+                 progressCallback)
+  
+  await syncData(paperApi.getDeals.bind(paperApi), 
+                 { ...params, offset: paperOffset  }, 
+                 cachePaperDeals, 
+                 progressCallback)
 }
 
 async function syncData(apiCallback, 

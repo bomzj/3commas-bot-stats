@@ -7,55 +7,94 @@ const $q = useQuasar()
 let syncing = ref(false)
 
 async function syncData() {
-  syncing.value = true
-  await syncAccounts(createProgressHandler('accounts'))
-  await syncBots(createProgressHandler('bots'))
-  //await syncDeals(createProgressHandler('deals'))
-  syncing.value = false
+  try {
+    syncing.value = true
+    
+    let counters = [0, 0, 0]
+
+    var notify = $q.notify({
+      group: false, // required to be updatable
+      timeout: 0, // we want to be in control when it gets dismissed
+      spinner: true,
+      html: true,
+      message: `Syncing data...`,
+      caption: getProgressMessage(...counters, 0),
+      position: 'top',
+      classes: 'notify'
+    })
+
+    await syncAccounts(createProgressHandler(notify, counters, 0))
+    await syncBots(createProgressHandler(notify, counters, 1))
+    console.time('syncing')
+    await syncDeals(createProgressHandler(notify, counters, 2))
+    console.timeEnd('syncing')
+    
+    // Hide progress bar after completion
+    notify({
+      icon: 'done',
+      spinner: false,
+      message: `Syncing done!`,
+      caption: getProgressMessage(...counters),
+      timeout: 5000
+    })
+  } catch (error) {
+    console.error(error)
+    
+    // dismiss progress bar
+    notify()
+
+    $q.notify({
+        type: 'negative',
+        message: 'Sync failed. Try to sync again.',
+        timeout: 0,
+        position: 'top',
+        actions: [{ icon: 'close', color: 'white' }],
+    })
+  } finally {
+    syncing.value = false
+  }
 }
 
-function createProgressHandler(itemsName) {
-  let notify = $q.notify({
-    group: false, // required to be updatable
-    timeout: 0, // we want to be in control when it gets dismissed
-    spinner: true,
-    message: `Syncing ${itemsName}...`,
-    caption: '0',
-    position: 'top'
+function createProgressHandler(notify, counters, currentCounterIndex) {
+  notify({
+    caption: getProgressMessage(...counters, currentCounterIndex)
   })
-  
-  return onSyncProgress.bind( { notify, itemsName, syncedItemsCount: 0 })
+  return onSyncProgress.bind({ notify, counters, currentCounterIndex })
 }
 
 function onSyncProgress(data, done) {
-  this.syncedItemsCount += data.length
+  this.counters[this.currentCounterIndex] += data.length
 
   // Update progress bar
   this.notify({
-    caption: this.syncedItemsCount.toString(),
+    caption: getProgressMessage(...this.counters, this.currentCounterIndex),
   })
-  
-  // Hide progress bar after completion
-  if (done) {
-    this.notify({
-      icon: 'done',
-      spinner: false,
-      message: `Syncing ${this.itemsName} done!`,
-      caption: `${this.syncedItemsCount} ${this.itemsName}`,
-      timeout: 5000
-    })
-  }
+}
+
+function getProgressMessage(syncedAccountsCounter, 
+                            syncedBotsCounter, 
+                            syncedDealsCounter, 
+                            currentCounterIndex, ) {
+  let messages = [`${syncedAccountsCounter} accounts`, 
+                  `${syncedBotsCounter} bots`,
+                  `${syncedDealsCounter} deals`]
+
+  messages[currentCounterIndex] = `<strong>${messages[currentCounterIndex]}</strong>`
+
+  return messages.join('<br>')
 }
 </script>
 
 <template>
   <q-btn color="primary" 
-         label="Sync Data" 
+         :label="syncing ? 'Syncing...' : 'Sync Data'"
          icon="refresh" 
          @click="syncData" 
-         :loading="syncing"/>
+         :disable="syncing"/>
 </template>
 
-<style scoped>
-
+<style scope>
+  .notify {
+    min-width: 200px
+  }
 </style>

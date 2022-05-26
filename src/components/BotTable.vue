@@ -2,7 +2,7 @@
 import { ref, computed, nextTick, watch } from 'vue'
 import { useThreeCommasClient } from './ThreeCommasClient'
 import { formatCurrency } from './CurrencyFormatter'
-import { getAllBots } from './ThreeCommasDataCache'
+import { getAllBots, getFinishedPaperDealsCount } from './ThreeCommasDataCache'
 
 const columns = [
   {
@@ -62,8 +62,8 @@ const columns = [
 // let cancelledDeals = await useThreeCommasClient('paper').getDeals({ scope: 'cancelled'})
 // let failedDeals = await useThreeCommasClient('paper').getDeals({ scope: 'failed'})
 
-let sortedDeals = await useThreeCommasClient('paper').getDeals({ offset: 150000, order: 'closed_at', order_direction: 'asc', limit: 1000})
-
+//let sortedDeals = await useThreeCommasClient('paper').getDeals({ offset: 150000, order: 'closed_at', order_direction: 'asc', limit: 1000})
+let x = await getFinishedPaperDealsCount()
 // let bots = await getAllBots()
 // console.log(bots.length)
 
