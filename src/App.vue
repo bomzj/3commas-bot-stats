@@ -7,7 +7,7 @@ import SyncButton from './components/SyncButton.vue';
 <Suspense>
   <q-layout view="hhh lpR fff">
 
-    <q-header reveal class="bg-primary text-white">
+    <q-header class="bg-grey-9">
       <q-toolbar>
         <q-toolbar-title>
           <q-avatar>
@@ -23,7 +23,7 @@ import SyncButton from './components/SyncButton.vue';
       <q-page><BotTable /></q-page>
     </q-page-container>
 
-    <q-footer elevated class="bg-grey-8 text-white">
+    <q-footer elevated class="bg-grey-9">
       <q-toolbar>
         <q-toolbar-title>
           <q-avatar>

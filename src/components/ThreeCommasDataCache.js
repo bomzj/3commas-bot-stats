@@ -23,7 +23,7 @@ export async function getAllBots() {
 }
 
 export async function getBotsCount() {
-  return await  realDb.count('bots', IDBKeyRange.only())
+  return await realDb.count('bots', IDBKeyRange.only())
 }
 
 export async function deleteBots() {

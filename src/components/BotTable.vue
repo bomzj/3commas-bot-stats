@@ -20,7 +20,7 @@ const columns = [
     sortable: true
   },
   { name: 'todayProfit', align: 'center', label: 'Today', field: 'todayProfit', sortable: true },
-  { name: 'monthProfit', label: 'Current Month', field: 'fat', sortable: true },
+  { name: 'monthProfit', label: 'This Month', field: 'fat', sortable: true },
   { 
     name: 'totalProfit', 
     label: 'Total', 
@@ -109,7 +109,7 @@ async function onScroll({ to, ref }) {
 <template>
   <div class="q-pa-md">
     <q-table
-      class="my-sticky-dynamic"
+      class="bot-table"
       title="Bots"
       :rows="rows"
       :columns="columns"
@@ -120,27 +120,12 @@ async function onScroll({ to, ref }) {
       :virtual-scroll-sticky-size-start="48"
       :pagination="pagination"
       :rows-per-page-options="[0]"
-      @virtual-scroll="onScroll" />
+      @virtual-scroll="onScroll"
+       />
   </div>
 </template>
 
 <style lang="sass">
-.my-sticky-dynamic
-  /* height or max-height is important */
-  /* height: 410px */
-
-  .q-table__top,
-  .q-table__bottom,
-  thead tr:first-child th /* bg color is important for th; just specify one */
-    background-color: #fff
-
-  thead tr th
-    position: sticky
-    z-index: 1
-  /* this will be the loading indicator */
-  thead tr:last-child th
-    /* height of all previous header rows */
-    top: 48px
-  thead tr:first-child th
-    top: 0
+.bot-table 
+  color: $grey-4
 </style>

@@ -25,4 +25,4 @@ myApp.use(Quasar, {
 // Assumes you have a <div id="app"></div> in your index.html
 myApp.mount('#app')
 
-//Dark.set(true)
+Dark.set(true)

@@ -89,7 +89,7 @@ function getProgressMessage(syncedAccountsCounter,
 </script>
 
 <template>
-  <q-btn color="primary" 
+  <q-btn 
          :label="syncing ? 'Syncing...' : 'Sync Data'"
          icon="refresh" 
          @click="syncData" 
