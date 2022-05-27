@@ -19,11 +19,7 @@ export async function getRealAccounts() { return realDb.getAll('accounts') }
 export async function getPaperAccount() { return paperDb.getAll('accounts') }
 
 export async function getAllBots() {
-  let tx = realDb.transaction('bots', 'readonly')
-  //return await tx.store.index('custom').getAll(IDBKeyRange.only(31457974))
-  //return db.getAllFromIndex('bots', 'custom', IDBKeyRange.only('Kucoin31457974'))
-  return realDb.getAllFromIndex('bots', 'custom', IDBKeyRange.only(['Kucoin']))
-  //return await db.getAll('bots',  IDBKeyRange.only(8031804))
+  return (await Promise.all([realDb.getAll('bots'), paperDb.getAll('bots')])).flat()
 }
 
 export async function getBotsCount() {

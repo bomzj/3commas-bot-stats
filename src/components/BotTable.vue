@@ -1,8 +1,8 @@
 <script setup>
 import { ref, computed, nextTick, watch } from 'vue'
-import { useThreeCommasClient } from './ThreeCommasClient'
 import { formatCurrency } from './CurrencyFormatter'
-import { getAllBots, getFinishedPaperDealsCount } from './ThreeCommasDataCache'
+import { getAllBots } from './ThreeCommasDataCache'
+import emitter from './event-bus'
 
 const columns = [
   {
@@ -19,20 +19,19 @@ const columns = [
     format: val => val,
     sortable: true
   },
-  { name: '24hProfit', align: 'center', label: '24h', field: 'calories', sortable: true },
-  { name: '7daysProfit', label: '7 days', field: 'fat', sortable: true },
-  { name: '30daysProfit', label: '30 days', field: 'fat', sortable: true },
-  { name: 'dailyProfit', label: 'Daily profit', field: 'carbs' },
+  { name: 'todayProfit', align: 'center', label: 'Today', field: 'todayProfit', sortable: true },
+  { name: 'monthProfit', label: 'Current Month', field: 'fat', sortable: true },
   { 
-    name: 'completedDealsProfit', 
-    label: 'Completed deals profit', 
+    name: 'totalProfit', 
+    label: 'Total', 
     field: 'finished_deals_profit_usd',
     format: (val, row) => formatCurrency(val, 'USD'),
   },
   { 
-    name: 'Monthly ROI', 
-    label: 'Monthly ROI (%)', 
-    field: 'iron', sortable: true, 
+    name: 'monthlyRoi', 
+    label: 'Monthly ROI', 
+    field: 'iron', 
+    sortable: true, 
     sort: (a, b) =>  a - b },
   { 
     name: 'uPNL', 
@@ -53,29 +52,19 @@ const columns = [
 // allRows.value.forEach((row, index) => {
 //   row.index = index
 // })
-// let botsStats = await useThreeCommasClient('paper').getBotsStats({bot_id: 9003027})
-// let accounts = await useThreeCommasClient('real').accounts()
 
-// let activeDeals = await useThreeCommasClient('paper').getDeals({ scope: 'active'})
-// let finishedDeals = await useThreeCommasClient('paper').getDeals({ scope: 'finished'})
-// let completedDeals = await useThreeCommasClient('paper').getDeals({ scope: 'completed'})
-// let cancelledDeals = await useThreeCommasClient('paper').getDeals({ scope: 'cancelled'})
-// let failedDeals = await useThreeCommasClient('paper').getDeals({ scope: 'failed'})
+let bots = await getAllBots()
 
-//let sortedDeals = await useThreeCommasClient('paper').getDeals({ offset: 150000, order: 'closed_at', order_direction: 'asc', limit: 1000})
-let x = await getFinishedPaperDealsCount()
-// let bots = await getAllBots()
-// console.log(bots.length)
-
-const rows = ref([])
+const loading = ref(false)
+const rows = ref(bots)
 const pageSize = 50
 const nextPage = ref(2)
 let lastPage = 3
 const pagination = { rowsPerPage: 0 }
 
-const loading = ref(false)
-const api = useThreeCommasClient()
-
+emitter.on('end:syncing', async () => {
+  rows.value = await getAllBots()
+})
 // watch(store, () => {
 //   console.log('bots loaded into table')
 //   rows.value.push(...store.bots)

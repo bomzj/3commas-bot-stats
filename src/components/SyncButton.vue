@@ -1,7 +1,8 @@
 <script setup>
-import { ref, watch, watchEffect } from 'vue'
+import { inject, ref, watch, watchEffect } from 'vue'
 import { useQuasar } from 'quasar'
 import { syncAccounts, syncBots, syncDeals }  from './ThreeCommasDataSync'
+import emitter from './event-bus'
 
 const $q = useQuasar()
 let syncing = ref(false)
@@ -29,6 +30,8 @@ async function syncData() {
     await syncDeals(createProgressHandler(notify, counters, 2))
     console.timeEnd('syncing')
     
+    emitter.emit('end:syncing')
+
     // Hide progress bar after completion
     notify({
       icon: 'done',

@@ -4,6 +4,7 @@ import SyncButton from './components/SyncButton.vue';
 </script>
 
 <template>
+<Suspense>
   <q-layout view="hhh lpR fff">
 
     <q-header reveal class="bg-primary text-white">
@@ -34,4 +35,5 @@ import SyncButton from './components/SyncButton.vue';
     </q-footer>
 
   </q-layout>
+</Suspense>
 </template>
