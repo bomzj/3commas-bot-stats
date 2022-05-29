@@ -9,18 +9,27 @@ function openDb(name) {
       db.createObjectStore('accounts', { keyPath: 'id' })
       db.createObjectStore('bots', { keyPath: 'id' })
       
-      db.createObjectStore('deals', { keyPath: 'id' })
-        .createIndex('closed_at', 'closed_at')
+      let store = db.createObjectStore('deals', { keyPath: 'id' })
+      store.createIndex('closed_at', 'closed_at')
+      store.createIndex('bot_id', 'bot_id')
+
     }
   })
 }
 
 export async function getRealAccounts() { return realDb.getAll('accounts') }
-export async function getPaperAccount() { return paperDb.getAll('accounts') }
+export async function getPaperAccounts() { return paperDb.getAll('accounts') }
 
 export async function getAllBots() {
   return (await Promise.all([realDb.getAll('bots'), paperDb.getAll('bots')])).flat()
 }
+
+export async function getBotDeals(botId) {
+  let bot = await realDb.get('bots', IDBKeyRange.only(botId))
+  let db = bot ? realDb : paperDb
+  return db.getAllFromIndex('deals', 'bot_id', IDBKeyRange.only(botId))
+}
+
 
 export async function getBotsCount() {
   return await realDb.count('bots', IDBKeyRange.only())
@@ -28,10 +37,6 @@ export async function getBotsCount() {
 
 export async function deleteBots() {
   return await realDb.clear('bots')
-}
-
-export async function getBotDeals(botId, dealStatus) {
-  //return await db.getAll('bots')
 }
 
 /**

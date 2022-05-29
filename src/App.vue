@@ -1,10 +1,23 @@
 <script setup>
 import BotTable from './components/BotTable.vue'
-import SyncButton from './components/SyncButton.vue';
+import SyncButton from './components/SyncButton.vue'
+import { useQuasar } from 'quasar'
+
+const $q = useQuasar()
+
+$q.loading.show({
+  spinnerColor: 'grey-4',
+  messageColor: 'grey-4',
+  message: 'Loading bot table...'
+})
+
+function onLoaded() {
+  $q.loading.hide()
+}
 </script>
 
 <template>
-<Suspense>
+<Suspense @resolve="onLoaded">
   <q-layout view="hhh lpR fff">
 
     <q-header class="bg-grey-9">
