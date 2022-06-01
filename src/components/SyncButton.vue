@@ -2,6 +2,7 @@
 import { inject, ref, watch, watchEffect } from 'vue'
 import { useQuasar } from 'quasar'
 import { syncAccounts, syncBots, syncDeals }  from './ThreeCommasDataSync'
+import { updateCryptocurrencyRates } from './CryptocurrencyConverter'
 import emitter from './event-bus'
 
 const $q = useQuasar()
@@ -24,12 +25,16 @@ async function syncData() {
       classes: 'notify'
     })
 
+    console.time('syncing')
+    
     await syncAccounts(createProgressHandler(notify, counters, 0))
     await syncBots(createProgressHandler(notify, counters, 1))
-    console.time('syncing')
     await syncDeals(createProgressHandler(notify, counters, 2))
+    await updateCryptocurrencyRates()
+
     console.timeEnd('syncing')
-    
+
+    // Notify subscribers to update their views e.g. Bot Table
     emitter.emit('end:syncing')
 
     // Hide progress bar after completion
