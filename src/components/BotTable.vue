@@ -123,13 +123,13 @@ async function getTableData(bots) {
 
     let baseOrderVolume = +bot.base_order_volume * 
                            bot.max_active_deals * 
-                           bot.allowed_deals_on_same_pair
+                           (bot.allowed_deals_on_same_pair || 1) // fix for Single pair bot
 
     let safetyOrderMaxVolume = 0
     for (let i = 0; i < +bot.max_safety_orders; i++) {
       safetyOrderMaxVolume += +bot.safety_order_volume * Math.pow(+bot.martingale_volume_coefficient, i)
     }
-    safetyOrderMaxVolume *= bot.max_active_deals * bot.allowed_deals_on_same_pair
+    safetyOrderMaxVolume *= bot.max_active_deals * (bot.allowed_deals_on_same_pair || 1)
     
     let totalFunds = convertToUSD(baseOrderVolume + safetyOrderMaxVolume, quoteCurrency)
 
@@ -168,7 +168,7 @@ async function getTableData(bots) {
         // Calculate Locked Funds in active deals
         // TODO probably we need to handle situation when BO/SO are in base currency e.g. in CRV 
         // I suppose we use only stablecoins or BTC for BO/SO
-        row.lockedFunds += convertToUSD(+deal.bought_volume, quoteCurrency)
+        row.lockedFunds += +deal.bought_volume // convertToUSD(+deal.bought_volume, quoteCurrency)
         continue
       }
 
@@ -187,6 +187,7 @@ async function getTableData(bots) {
       }
     }
 
+    row.lockedFunds = convertToUSD(row.lockedFunds, quoteCurrency)
     rows.push(row)
   }
 
